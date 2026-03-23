@@ -11,6 +11,9 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
     private static final int W = Constants.GAME_W;
     private static final int H = Constants.GAME_H;
 
+    // 增加全局现代 UI 字体
+    private static final String UI_FONT = "Microsoft YaHei";
+
     // ── Network ────────────────────────────────────────────────────────────────
     private NetworkManager net;
     private String host;
@@ -46,13 +49,13 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
 
     // ── UI helpers ─────────────────────────────────────────────────────────────
     private static final Color[] CLASS_COLOR = {
-        new Color(55,138,221), new Color(127,119,221), new Color(226,75,74)
+            new Color(55,138,221), new Color(127,119,221), new Color(226,75,74)
     };
     private static final String[] CLASS_NAME  = {"枪手","魔法师","剑士"};
     private static final String[] CLASS_DESC  = {
-        "射速快 · 三连散弹\n技能: 弹幕风暴\nHP:350  MP:220\n\n克制: 近战接近\n被克: 魔法减速",
-        "AoE + 控制\n技能: 冰霜/火焰/护盾\nHP:250  MP:320\n\n克制: 枪手风筝\n被克: 近战爆发",
-        "高HP · 近战\n技能: 旋风/冲锋/反弹\nHP:500  MP:160\n\n克制: 魔法师\n被克: 枪手弹幕"
+            "射速快 · 三连散弹\n技能: 弹幕风暴\nHP:350  MP:220\n\n克制: 近战接近\n被克: 魔法减速",
+            "AoE + 控制\n技能: 冰霜/火焰/护盾\nHP:250  MP:320\n\n克制: 枪手风筝\n被克: 近战爆发",
+            "高HP · 近战\n技能: 旋风/冲锋/反弹\nHP:500  MP:160\n\n克制: 魔法师\n被克: 枪手弹幕"
     };
 
     private String statusMsg = "正在连接服务器...";
@@ -173,8 +176,16 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2=bufG;
-        g2.setColor(new Color(8,7,20)); g2.fillRect(0,0,W,H+150);
+        Graphics2D g2 = bufG;
+
+        // 开启全局抗锯齿和字体平滑
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // 绘制更具高级感的星空深蓝色渐变背景
+        GradientPaint bgGradient = new GradientPaint(0, 0, new Color(15, 12, 35), 0, H + 150, new Color(5, 4, 15));
+        g2.setPaint(bgGradient);
+        g2.fillRect(0, 0, W, H + 150);
 
         switch(screen) {
             case CONNECT:    drawConnect(g2); break;
@@ -190,10 +201,10 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
     // ─── Screens ───────────────────────────────────────────────────────────────
     private void drawConnect(Graphics2D g) {
         drawStars(g);
-        g.setFont(new Font("Monospaced",Font.BOLD,28));
+        g.setFont(new Font(UI_FONT,Font.BOLD,28));
         g.setColor(new Color(245,196,117));
         drawCentered(g,"像素对战 联机版",W/2,180);
-        g.setFont(new Font("Monospaced",Font.PLAIN,14));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,14));
         g.setColor(new Color(150,148,180));
         drawCentered(g,statusMsg,W/2,230);
         // Spinner
@@ -205,7 +216,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
 
     private void drawLobby(Graphics2D g) {
         drawStars(g);
-        g.setFont(new Font("Monospaced",Font.BOLD,22));
+        g.setFont(new Font(UI_FONT,Font.BOLD,22));
         g.setColor(new Color(245,196,117));
         drawCentered(g,"选择职业",W/2,55);
 
@@ -216,7 +227,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         // Status
         String myStatus = myClass>=0?(myReady?"✓ 已就绪":"已选: "+CLASS_NAME[myClass]):"请选择职业";
         String opStatus = oppClass>=0?(oppReady?"✓ 已就绪":"已选职业"):"等待对方选择...";
-        g.setFont(new Font("Monospaced",Font.PLAIN,12));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,12));
         g.setColor(new Color(93,202,165));
         drawCentered(g,"你: "+myStatus,W/4,362);
         g.setColor(new Color(240,153,123));
@@ -228,17 +239,17 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             g.setColor(hover?new Color(93,202,165):new Color(30,58,45));
             g.fillRoundRect(W/2-70,375,140,36,8,8);
             g.setColor(hover?new Color(8,7,20):new Color(93,202,165));
-            g.setFont(new Font("Monospaced",Font.BOLD,14));
+            g.setFont(new Font(UI_FONT,Font.BOLD,14));
             drawCentered(g,"进入技能配置",W/2,399);
         }
         if(myReady){
             g.setColor(new Color(245,196,117));
-            g.setFont(new Font("Monospaced",Font.BOLD,13));
+            g.setFont(new Font(UI_FONT,Font.BOLD,13));
             drawCentered(g,"等待对方就绪...",W/2,393);
         }
 
         // Controls hint
-        g.setFont(new Font("Monospaced",Font.PLAIN,10));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,10));
         g.setColor(new Color(80,78,110));
         drawCentered(g,"WASD移动 · 鼠标攻击 · J/K/L/F技能 · Shift护盾",W/2,430);
     }
@@ -265,14 +276,14 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         drawHeroSprite(g,x+w/2,y+65,i);
 
         // Name
-        g.setFont(new Font("Monospaced",Font.BOLD,16));
+        g.setFont(new Font(UI_FONT,Font.BOLD,16));
         g.setColor(selected?ac:new Color(220,218,240));
         drawCentered(g,CLASS_NAME[i],x+w/2,y+108);
 
         g.setColor(new Color(45,42,75)); g.drawLine(x+10,y+115,x+w-10,y+115);
 
         // Desc
-        g.setFont(new Font("Monospaced",Font.PLAIN,9));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,9));
         g.setColor(new Color(150,148,180));
         String[] lines=CLASS_DESC[i].split("\n");
         for(int l=0;l<lines.length;l++){
@@ -285,17 +296,17 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
 
         if(oppSel){
             g.setColor(new Color(240,153,123,160));
-            g.setFont(new Font("Monospaced",Font.BOLD,9));
+            g.setFont(new Font(UI_FONT,Font.BOLD,9));
             drawCentered(g,"对方已选",x+w/2,y+h-10);
         }
     }
 
     private void drawSkillPick(Graphics2D g) {
         drawStars(g);
-        g.setFont(new Font("Monospaced",Font.BOLD,20));
+        g.setFont(new Font(UI_FONT,Font.BOLD,20));
         g.setColor(new Color(245,196,117));
         drawCentered(g,"技能配置  (剩余点数: "+skillPointsBudget+")",W/2,48);
-        g.setFont(new Font("Monospaced",Font.PLAIN,11));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,11));
         g.setColor(new Color(120,118,150));
         drawCentered(g,"点击技能卡片分配技能点，每个技能最多3级",W/2,68);
 
@@ -310,7 +321,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         g.setColor(hover?new Color(245,196,117):new Color(60,50,20));
         g.fillRoundRect(W/2-80,H-60,160,38,8,8);
         g.setColor(hover?new Color(8,7,20):new Color(245,196,117));
-        g.setFont(new Font("Monospaced",Font.BOLD,14));
+        g.setFont(new Font(UI_FONT,Font.BOLD,14));
         drawCentered(g,"确认配置",W/2,H-34);
     }
 
@@ -325,11 +336,11 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         g.drawRoundRect(x,y,w,h,8,8);
         g.setStroke(new BasicStroke(1));
         // Icon
-        g.setFont(new Font("Monospaced",Font.PLAIN,26));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,26));
         g.setColor(lvl>0?ac:new Color(70,68,100));
         drawCentered(g,sk.icon,x+w/2,y+44);
         // Name
-        g.setFont(new Font("Monospaced",Font.BOLD,12));
+        g.setFont(new Font(UI_FONT,Font.BOLD,12));
         g.setColor(lvl>0?new Color(220,218,240):new Color(120,118,150));
         drawCentered(g,sk.name,x+w/2,y+62);
         // Type badge
@@ -338,28 +349,28 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         g.setColor(tColors[sk.type]);
         g.fillRoundRect(x+w/2-22,y+66,44,14,4,4);
         g.setColor(new Color(8,7,20));
-        g.setFont(new Font("Monospaced",Font.BOLD,8));
+        g.setFont(new Font(UI_FONT,Font.BOLD,8));
         drawCentered(g,types[sk.type],x+w/2,y+76);
         // Level pips
         for(int l=0;l<sk.maxLevel;l++){
             g.setColor(l<lvl?ac:new Color(35,33,60));
             g.fillRect(x+w/2-sk.maxLevel*12+l*26+2,y+86,22,8);
         }
-        g.setFont(new Font("Monospaced",Font.PLAIN,9));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,9));
         g.setColor(new Color(130,128,160));
         drawCentered(g,"Lv."+lvl+"/"+sk.maxLevel,x+w/2,y+108);
         // Current level desc
         if(lvl>0 && lvl<=sk.levelDesc.length){
-            g.setFont(new Font("Monospaced",Font.PLAIN,8));
+            g.setFont(new Font(UI_FONT,Font.PLAIN,8));
             g.setColor(new Color(160,158,200));
             drawWrapped(g,sk.levelDesc[lvl-1],x+6,y+120,w-12,10);
         } else if(lvl==0){
-            g.setFont(new Font("Monospaced",Font.PLAIN,8));
+            g.setFont(new Font(UI_FONT,Font.PLAIN,8));
             g.setColor(new Color(80,78,110));
             drawWrapped(g,"点击分配技能点",x+6,y+120,w-12,10);
         }
         // Counter note
-        g.setFont(new Font("Monospaced",Font.PLAIN,7));
+        g.setFont(new Font(UI_FONT,Font.PLAIN,7));
         g.setColor(new Color(100,98,130));
         g.drawLine(x+8,y+150,x+w-8,y+150);
         drawWrapped(g,sk.counterNote,x+6,y+157,w-12,9);
@@ -369,31 +380,31 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             g.setColor(bHover?ac:new Color(30,28,55));
             g.fillRoundRect(x+w/2-30,y+h-38,60,24,6,6);
             g.setColor(bHover?new Color(8,7,20):ac);
-            g.setFont(new Font("Monospaced",Font.BOLD,12));
+            g.setFont(new Font(UI_FONT,Font.BOLD,12));
             drawCentered(g,"+ 升级",x+w/2,y+h-20);
         } else if(maxed){
             g.setColor(new Color(93,202,165));
-            g.setFont(new Font("Monospaced",Font.BOLD,11));
+            g.setFont(new Font(UI_FONT,Font.BOLD,11));
             drawCentered(g,"★ 满级",x+w/2,y+h-20);
         }
     }
 
     private void drawWaiting(Graphics2D g) {
         drawStars(g);
-        g.setFont(new Font("Monospaced",Font.BOLD,18));
+        g.setFont(new Font(UI_FONT,Font.BOLD,18));
         g.setColor(new Color(245,196,117));
         drawCentered(g,"等待对方完成技能配置...",W/2,H/2-20);
         int sp=(int)(System.currentTimeMillis()/250%4);
         String[] sps={"|","/","-","\\"};
         g.setColor(new Color(93,202,165));
-        g.setFont(new Font("Monospaced",Font.BOLD,22));
+        g.setFont(new Font(UI_FONT,Font.BOLD,22));
         drawCentered(g,sps[sp],W/2,H/2+20);
     }
 
     private void drawGame(Graphics2D g) {
         if(gameState==null){
             g.setColor(new Color(20,18,40)); g.fillRect(0,0,W,H);
-            g.setFont(new Font("Monospaced",Font.BOLD,16));
+            g.setFont(new Font(UI_FONT,Font.BOLD,16));
             g.setColor(new Color(245,196,117));
             drawCentered(g,"等待游戏数据...",W/2,H/2);
             return;
@@ -404,7 +415,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         renderer.drawSkillPanel(g,myP,true,0,H+2);
         // Status message
         if(msgTimer>0&&!statusMsg.isEmpty()){
-            g.setFont(new Font("Monospaced",Font.BOLD,13));
+            g.setFont(new Font(UI_FONT,Font.BOLD,13));
             g.setColor(new Color(245,196,117,Math.min(255,msgTimer*3)));
             drawCentered(g,statusMsg,W/2,H-14);
         }
@@ -414,13 +425,13 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         g.setColor(new Color(0,0,0,170)); g.fillRect(0,0,W,H);
         int winnerId=gameState!=null?gameState.winnerId:0;
         boolean iWon=(winnerId==myId);
-        g.setFont(new Font("Monospaced",Font.BOLD,36));
+        g.setFont(new Font(UI_FONT,Font.BOLD,36));
         g.setColor(iWon?new Color(245,196,117):new Color(226,75,74));
         drawCentered(g,iWon?"胜利！":"失败...",W/2,H/2-50);
         if(gameState!=null){
             GameState.PlayerState me=(myId==1)?gameState.p1:gameState.p2;
             GameState.PlayerState opp=(myId==1)?gameState.p2:gameState.p1;
-            g.setFont(new Font("Monospaced",Font.PLAIN,13));
+            g.setFont(new Font(UI_FONT,Font.PLAIN,13));
             g.setColor(new Color(180,178,210));
             drawCentered(g,"击杀: "+me.kills,W/2,H/2);
         }
@@ -428,7 +439,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         g.setColor(hover?new Color(245,196,117):new Color(55,45,15));
         g.fillRoundRect(W/2-75,H/2+30,150,36,8,8);
         g.setColor(hover?new Color(8,7,20):new Color(245,196,117));
-        g.setFont(new Font("Monospaced",Font.BOLD,14));
+        g.setFont(new Font(UI_FONT,Font.BOLD,14));
         drawCentered(g,"再来一局",W/2,H/2+54);
     }
 
@@ -467,9 +478,9 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         switch(classIndex){
             case 0:g.setColor(new Color(100,100,120));g.fillRect(cx+8,cy-1,18,4);break;
             case 1:g.setColor(new Color(175,153,236));g.fillRect(cx-5,cy+6,3,14);
-                   g.setColor(new Color(245,196,117));g.fillOval(cx-7,cy+18,8,8);break;
+                g.setColor(new Color(245,196,117));g.fillOval(cx-7,cy+18,8,8);break;
             case 2:g.setColor(new Color(180,178,169));g.fillRect(cx+8,cy-18,4,24);
-                   g.setColor(new Color(220,200,100));g.fillRect(cx+5,cy-22,10,7);break;
+                g.setColor(new Color(220,200,100));g.fillRect(cx+5,cy-22,10,7);break;
         }
     }
 
