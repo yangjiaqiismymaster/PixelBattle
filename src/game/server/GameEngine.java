@@ -21,8 +21,9 @@ public class GameEngine {
 
     public GameEngine(int class1, int class2, int[] skillLevels1, int[] skillLevels2) {
         buildWalls();
-        initPlayer(state.p1, 1, class1, 150, Constants.GAME_H/2f, skillLevels1);
-        initPlayer(state.p2, 2, class2, Constants.GAME_W - 150, Constants.GAME_H/2f, skillLevels2);
+        // 修复BUG：将两边玩家的出生点向外稍微平移（由 150 改为 90），防止与生成的方块墙壁重叠
+        initPlayer(state.p1, 1, class1, 90, Constants.GAME_H/2f, skillLevels1);
+        initPlayer(state.p2, 2, class2, Constants.GAME_W - 90, Constants.GAME_H/2f, skillLevels2);
     }
 
     private void initPlayer(GameState.PlayerState p, int id, int classId, float x, float y, int[] levels) {
@@ -57,7 +58,7 @@ public class GameEngine {
         for (int r=0;r<ROWS;r++) { wallMap[r*COLS]=true; wallMap[r*COLS+COLS-1]=true; }
         // Interior blocks (symmetric)
         int[][] blocks = {{3,3},{3,ROWS-4},{COLS/2,3},{COLS/2,ROWS-4},{COLS-4,3},{COLS-4,ROWS-4},
-                          {4,ROWS/2},{COLS-5,ROWS/2},{COLS/2-1,ROWS/2-1},{COLS/2-1,ROWS/2},{COLS/2,ROWS/2-1},{COLS/2,ROWS/2}};
+                {4,ROWS/2},{COLS-5,ROWS/2},{COLS/2-1,ROWS/2-1},{COLS/2-1,ROWS/2},{COLS/2,ROWS/2-1},{COLS/2,ROWS/2}};
         for (int[] b : blocks) {
             if(b[0]>=0&&b[0]<COLS&&b[1]>=0&&b[1]<ROWS) wallMap[b[1]*COLS+b[0]]=true;
         }
