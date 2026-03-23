@@ -12,7 +12,7 @@ public class Renderer {
     private static final String FONT_EN = "Arial";
 
     private static final Color[] CLASS_COLOR = {
-        new Color(55,138,221), new Color(127,119,221), new Color(226,75,74)
+            new Color(55,138,221), new Color(127,119,221), new Color(226,75,74)
     };
     private static final String[] CLASS_NAME = {"枪手","魔法师","剑士"};
 
@@ -27,7 +27,7 @@ public class Renderer {
         for(int c=0;c<COLS;c++){wallMap[c]=true;wallMap[(ROWS-1)*COLS+c]=true;}
         for(int r=0;r<ROWS;r++){wallMap[r*COLS]=true;wallMap[r*COLS+COLS-1]=true;}
         int[][] blocks={{3,3},{3,ROWS-4},{COLS/2,3},{COLS/2,ROWS-4},{COLS-4,3},{COLS-4,ROWS-4},
-                        {4,ROWS/2},{COLS-5,ROWS/2},{COLS/2-1,ROWS/2-1},{COLS/2-1,ROWS/2},{COLS/2,ROWS/2-1},{COLS/2,ROWS/2}};
+                {4,ROWS/2},{COLS-5,ROWS/2},{COLS/2-1,ROWS/2-1},{COLS/2-1,ROWS/2},{COLS/2,ROWS/2-1},{COLS/2,ROWS/2}};
         for(int[] b:blocks) if(b[0]>=0&&b[0]<COLS&&b[1]>=0&&b[1]<ROWS) wallMap[b[1]*COLS+b[0]]=true;
     }
 
@@ -47,7 +47,7 @@ public class Renderer {
         drawHUD(g,gs,myId,tick);
     }
 
-    // ─── 地图 ─────────────────────────────────────────────────────────────────
+    // ─── 地图优化渲染 ─────────────────────────────────────────────────────────────────
     private void drawMap(Graphics2D g){
         for(int r=0;r<ROWS;r++) for(int c=0;c<COLS;c++){
             int px=c*TILE,py=r*TILE;
@@ -56,16 +56,19 @@ public class Renderer {
         }
     }
     private void drawFloor(Graphics2D g,int x,int y){
-        g.setColor(new Color(18,17,36)); g.fillRect(x,y,TILE,TILE);
-        g.setColor(new Color(24,22,48)); g.fillRect(x+1,y+1,TILE-2,TILE-2);
-        g.setColor(new Color(28,26,55)); g.drawRect(x,y,TILE,TILE);
+        g.setColor(new Color(18,17,36));
+        g.fillRect(x,y,TILE,TILE);
+        g.setColor(new Color(24,22,48));
+        g.fillRoundRect(x+2,y+2,TILE-4,TILE-4, 4, 4); // 地面轻微内圆角，更干净
     }
     private void drawWall(Graphics2D g,int x,int y){
-        g.setColor(new Color(45,42,78)); g.fillRect(x,y,TILE,TILE);
-        g.setColor(new Color(68,64,112)); g.fillRect(x+1,y+1,TILE-2,5);
-        g.setColor(new Color(72,68,118)); g.fillRect(x+1,y+1,3,TILE-2);
-        g.setColor(new Color(22,20,40)); g.fillRect(x+TILE-3,y+1,2,TILE-2);
-        g.setColor(new Color(12,10,22)); g.drawRect(x,y,TILE-1,TILE-1);
+        // 墙体圆角与高光优化
+        g.setColor(new Color(45,42,78));
+        g.fillRoundRect(x, y, TILE, TILE, 8, 8);
+        g.setColor(new Color(75,70,120));
+        g.fillRoundRect(x+2, y+2, TILE-4, 6, 4, 4); // 顶部高光
+        g.setColor(new Color(15,12,25));
+        g.drawRoundRect(x, y, TILE-1, TILE-1, 8, 8); // 边缘描边
     }
 
     // ─── 玩家 ─────────────────────────────────────────────────────────────────
@@ -137,7 +140,7 @@ public class Renderer {
                 g.setColor(new Color(180,178,169)); g.fillRect(8,-22,5,26);
                 g.setColor(new Color(220,200,100)); g.fillRect(5,-26,11,8);
                 if(shielding){g.setColor(new Color(60,80,160));g.fillRect(-14,-12,10,20);
-                              g.setColor(new Color(100,130,220));g.fillRect(-13,-11,8,18);}
+                    g.setColor(new Color(100,130,220));g.fillRect(-13,-11,8,18);}
                 break;
         }
     }
@@ -261,11 +264,19 @@ public class Renderer {
         }
     }
 
+    // ─── 血条/蓝条优化渲染 ──────────────────────────────────────────────────────────
     private void drawBar(Graphics2D g,int x,int y,int w,int h,int val,int max,Color fill,Color bg){
-        g.setColor(bg); g.fillRoundRect(x,y,w,h,3,3);
-        int fw=max>0?(int)((float)val/max*w):0;
-        if(fw>0){g.setColor(fill);g.fillRoundRect(x,y,fw,h,3,3);}
-        g.setColor(new Color(255,255,255,30)); g.drawRoundRect(x,y,w,h,3,3);
+        g.setColor(bg);
+        g.fillRoundRect(x,y,w,h,6,6); // 增加圆角
+        int fw = max > 0 ? (int)((float)val/max*w) : 0;
+        if(fw > 0){
+            // 增加渐变色高光效果
+            GradientPaint barPaint = new GradientPaint(x, y, fill.brighter(), x, y+h, fill.darker());
+            g.setPaint(barPaint);
+            g.fillRoundRect(x,y,fw,h,6,6);
+        }
+        g.setColor(new Color(255,255,255,40));
+        g.drawRoundRect(x,y,w,h,6,6);
     }
 
     // ─── 底部技能面板 ──────────────────────────────────────────────────────────
